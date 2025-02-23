@@ -3,8 +3,6 @@
 
 ## Testing Links
 
-## 🚦 Testing Links
-
 | API Endpoint                              | Description                           |
 |------------------------------------------|--------------------------------------|
 | `/api/eras`                               | Get all eras                          |
