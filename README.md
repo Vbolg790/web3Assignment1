@@ -1,5 +1,4 @@
 # Art Gallery API - COMP 4513 Assignment 1
-### Winter 2025
 
 ## Overview
 This project is an API built with Node.js and Express that interfaces with an art database hosted on Supabase. The API provides access to information about paintings, artists, genres, galleries, and eras through various endpoints. The primary goal of this assignment is to demonstrate proficiency in building a RESTful API, querying a database, and hosting the application, my choice being Render.com.
