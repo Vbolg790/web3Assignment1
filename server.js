@@ -1,12 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const supa = require("@supabase/supabase-js");
 const { sendResponse } = require("./sendResponse");
 const app = express();
-const PORT = 8080;
 
-const supaUrl = "https://sfvihxfzaqgavtycqrui.supabase.co";
-const supaAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmdmloeGZ6YXFnYXZ0eWNxcnVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAxNjc1MDMsImV4cCI6MjA1NTc0MzUwM30.XFmoYT2gEaWYssnKp260crQ3Bsxingxqz8dXiqUbddc";
+const PORT = process.env.PORT || 8080;
+
+const supaUrl = process.env.SUPABASE_URL;
+const supaAnonKey = process.env.SUPABASE_ANON_KEY;
 
 const supabase = supa.createClient(supaUrl, supaAnonKey);
 
