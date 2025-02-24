@@ -89,37 +89,137 @@ app.get("/api/artists/country/:nationality", async (req, res) => {
 });
 
 // Returns all the paintings ( return all the fields in the paintings table, but not the foreign keys) by default, sort by title
-// app.get("/api/paintings", async (req, res) => {
-//   const result = await supabase
-//     .from("paintings")
-//     .select(paintings(), galleries(), artists())
-//     .order("title", { ascending: true });
-//   sendResponse(res, result, "No paintings found");
-// });
+app.get("/api/paintings", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(
+      `*, artist:artists (*),
+      gallery:galleries (*)`
+    )
+    .order("title", { ascending: true });
+  sendResponse(res, { data, error }, "No paintings found");
+});
 
 // Returns all the paintings, sorted by either title or yearOfWork
-// app.get("/api/paintings/sort/:sortBy", async (req, res) => {
-//   const sortBy = req.params.sortBy === "year" ? "yearOfWork" : "title";
+app.get("/api/paintings/sort/:sortBy", async (req, res) => {
+  const sortBy = req.params.sortBy === "year" ? "yearOfWork" : "title";
 
-//   const { data, error } = await supabase
-//     .from("paintings")
-//     .select()
-//     .order(sortBy, { ascending: true });
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(
+      `*, artist:artists (*),
+      gallery:galleries (*)`
+    )
+    .order(sortBy, { ascending: true });
 
-//   res.send(data);
-// });
+  sendResponse(res, { data, error }, "No paintings found");
+});
 
 // Returns just the specified painting
+app.get("/api/paintings/:paintingId", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .eq("paintingId", req.params.paintingId);
+  // .single();
+
+  sendResponse(
+    res,
+    { data, error },
+    `No painting found with id ${req.params.paintingId}`
+  );
+});
 
 // Returns the paintings whose title (case insensitive) contains the provided substring
+app.get("/api/paintings/search/:substring", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .ilike("title", `%${req.params.substring}%`)
+    .order("title", { ascending: true });
+
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found with titles containing "${req.params.substring}".`
+  );
+});
 
 // Returns the paintings between two years (include the paintings in the provided years), ordered by yearOfWork
+app.get("/api/paintings/years/:startYear/:endYear", async (req, res) => {
+  const startYear = parseInt(req.params.startYear, 10);
+  const endYear = parseInt(req.params.endYear, 10);
+
+  if (isNaN(startYear) || isNaN(endYear)) {
+    return res.status(400).json({
+      error: "Both start and end years need to be a number",
+    });
+  }
+  if (endYear < startYear) {
+    return res.status(400).json({
+      error:
+        "End year is earlier than start year, please enter a valid year range",
+    });
+  }
+
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .gte("yearOfWork", startYear)
+    .lte("yearOfWork", endYear)
+    .order("yearOfWork", { ascending: true });
+
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found between the years ${startYear} and ${endYear}`
+  );
+});
 
 // Returns all the paintings in a given gallery using the galleryId field
+app.get("/api/paintings/galleries/:galleryId", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .eq("galleryId", req.params.galleryId)
+    .order("title", { ascending: true });
+
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found for gallery id ${req.params.galleryId}`
+  );
+});
 
 // Returns all the paintings by a given artist useing the artistId field
+app.get("/api/paintings/artist/:artistId", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .eq("artistId", req.params.artistId)
+    .order("title", { ascending: true });
+
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found for artist id ${req.params.artistId}`
+  );
+});
 
 // Returns all the paintings by artists whose nationality begins with the provided substring
+app.get("/api/paintings/artists/country/:nationality", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select(`*, artist:artists (*), gallery:galleries (*)`)
+    .ilike("artist.nationality", `${req.params.nationality}%`)
+    .order("title", { ascending: true });
+
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found for artists with nationality starting with "${req.params.nationality}"`
+  );
+});
 
 // Returns all the genres. For this and the following genres requests, don’t just provide the foreign keys for era; instead provide all the era fields
 app.get("/api/genres", async (req, res) => {
@@ -160,22 +260,47 @@ app.get("/api/genres/paintings/:paintingId", async (req, res) => {
       genre:genres (*, era:eras (*))
     `
     )
-    .eq("paintingId", req.params.paintingId);
-
-  const sortedData = data.sort((a, b) =>
-    a.genre.genreName.localeCompare(b.genre.genreName)
-  );
+    .eq("paintingId", req.params.paintingId)
+    .order("genre(genreName)", { ascending: true });
 
   sendResponse(
     res,
-    { data: sortedData, error },
+    { data, error },
     `No genres found for painting ${req.params.paintingId}`
   );
 });
 
-// Returns all the paintings for a given genre using genreId, return just paitningId, title, and yearOfWork
+// Returns all the paintings for a given genre using genreId, return just paitningId, title, and yearOfWork. Sort by yearOfWor
+app.get("/api/paintings/genre/:genreId", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintinggenres")
+    .select(`paintings:paintings (paintingId, title, yearOfWork)`)
+    .eq("genreId", req.params.genreId)
+    .order("paintings(yearOfWork)", {
+      ascending: true,
+    });
+  sendResponse(
+    res,
+    { data, error },
+    `No paintings found for genre ${req.params.genreId}`
+  );
+});
 
 // Returns all the paintings for a given era useing the eraId field, return just the paintingId, title, and yearOfWork. Sort by yearOfWork
+app.get("/api/paintings/era/:eraId", async (req, res) => {
+  const { data, error } = await supabase
+    .from("paintings")
+    .select("paintingId, title, yearOfWork")
+    .eq("eraId", req.params.eraId);
+
+  const sortedData = data.sort((a, b) => a.yearOfWork - b.yearOfWork);
+
+  sendResponse(
+    res,
+    { data: sortedData, error },
+    `No paintings found for era ${req.params.eraId}`
+  );
+});
 
 // Returns the genre name and the number of paintings for each genre, sorted by the number of paintings (fewest to most)
 
