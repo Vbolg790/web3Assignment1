@@ -13,7 +13,7 @@ This project is an API built with Node.js and Express that interfaces with an ar
 
 | API Endpoint                              | Description                           |
 |------------------------------------------|--------------------------------------|
-| `/api/eras`                               | Get all eras                          |
+| [/api/eras](https://web3assignment1.onrender.com/api/eras)                               | Get all eras                          |
 | `/api/galleries`                          | Get all galleries                     |
 | `/api/galleries/30`                       | Get gallery with ID 30                |
 | `/api/galleries/Calgary`                  | Get gallery by name 'Calgary'         |
