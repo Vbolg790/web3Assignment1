@@ -309,22 +309,24 @@ app.get("/api/paintings/era/:ref", async (req, res) => {
 });
 
 // Returns the genre name and the number of paintings for each genre, sorted by the number of paintings (fewest to most)
-// reduce and how to use it was taken from this site: https://www.geeksforgeeks.org/count-occurrences-of-all-items-in-an-array-in-javascript/
 app.get("/api/counts/genres", async (req, res) => {
   const { data, error } = await supabase
     .from("paintinggenres")
     .select("genre:genres (genreName), paintingId");
 
-  const genreCounts = data.reduce((acc, { genre }) => {
+  const genreCount = {};
+  data.forEach(({ genre }) => {
     if (genre?.genreName) {
-      acc[genre.genreName] = (acc[genre.genreName] || 0) + 1;
+      genreCount[genre.genreName] = (genreCount[genre.genreName] || 0) + 1;
     }
-    return acc;
   });
 
-  const sortedData = Object.entries(genreCounts)
-    .map(([genreName, count]) => ({ genreName, count }))
-    .sort((a, b) => a.count - b.count);
+  const sortedData = [];
+  Object.entries(genreCount).forEach(([genreName, count]) => {
+    sortedData.push({ genreName, count });
+  });
+
+  sortedData.sort((a, b) => a.count - b.count);
 
   sendResponse(res, { data: sortedData, error }, "No genre counts found");
 });
@@ -335,23 +337,25 @@ app.get("/api/counts/artists", async (req, res) => {
     .from("paintings")
     .select("artist:artists (firstName, lastName), paintingId");
 
-  const artistPaintingCounts = paintingArtists.reduce(
-    (artistCountMap, { artist }) => {
-      if (artist?.firstName && artist?.lastName) {
-        const artistName = `${artist.firstName} ${artist.lastName}`;
-        artistCountMap[artistName] = (artistCountMap[artistName] || 0) + 1;
-      }
-      return artistCountMap;
+  const artistPaintingCount = {};
+  paintingArtists.forEach(({ artist }) => {
+    if (artist?.firstName && artist?.lastName) {
+      const artistName = `${artist.firstName} ${artist.lastName}`;
+      artistPaintingCount[artistName] =
+        (artistPaintingCount[artistName] || 0) + 1;
     }
-  );
+  });
 
-  const sortedArtistCounts = Object.entries(artistPaintingCounts)
-    .map(([artistName, paintingCount]) => ({ artistName, paintingCount }))
-    .sort((a, b) => b.paintingCount - a.paintingCount);
+  const sortedArtistCount = [];
+  Object.entries(artistPaintingCount).forEach(([artistName, paintingCount]) => {
+    sortedArtistCount.push({ artistName, paintingCount });
+  });
+
+  sortedArtistCount.sort((a, b) => b.paintingCount - a.paintingCount);
 
   sendResponse(
     res,
-    { data: sortedArtistCounts, error },
+    { data: sortedArtistCount, error },
     "No artist painting counts found"
   );
 });
@@ -364,21 +368,22 @@ app.get("/api/counts/topgenres/:ref", async (req, res) => {
     .from("paintinggenres")
     .select("genre:genres (genreName), paintingId");
 
-  const genrePaintingCounts = paintingGenres.reduce(
-    (genreCountMap, { genre }) => {
-      if (genre?.genreName) {
-        genreCountMap[genre.genreName] =
-          (genreCountMap[genre.genreName] || 0) + 1;
-      }
-      return genreCountMap;
-    },
-    {}
-  );
+  const genrePaintingCounts = {};
+  paintingGenres.forEach(({ genre }) => {
+    if (genre?.genreName) {
+      genrePaintingCounts[genre.genreName] =
+        (genrePaintingCounts[genre.genreName] || 0) + 1;
+    }
+  });
 
-  const filteredAndSortedGenres = Object.entries(genrePaintingCounts)
-    .map(([genreName, paintingCount]) => ({ genreName, paintingCount }))
-    .filter(({ paintingCount }) => paintingCount > minCount)
-    .sort((a, b) => b.paintingCount - a.paintingCount);
+  const filteredAndSortedGenres = [];
+  Object.entries(genrePaintingCounts).forEach(([genreName, paintingCount]) => {
+    if (paintingCount > minCount) {
+      filteredAndSortedGenres.push({ genreName, paintingCount });
+    }
+  });
+
+  filteredAndSortedGenres.sort((a, b) => b.paintingCount - a.paintingCount);
 
   sendResponse(
     res,
