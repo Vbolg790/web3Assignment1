@@ -44,11 +44,11 @@ module.exports = (supabase, sendResponse) => {
       .from("paintinggenres")
       .select(
         `
-        genre:genres (*, era:eras (*))
+        ...genres (*, era:eras (*))
       `
       )
       .eq("paintingId", req.params.ref)
-      .order("genre(genreName)", { ascending: true });
+      .order("genres(genreName)", { ascending: true });
 
     sendResponse(
       res,

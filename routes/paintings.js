@@ -1,15 +1,27 @@
 const express = require("express");
 const router = express.Router();
 
+const paintingsSelect = `
+    paintingId, imageFileName, title, museumLink, accessionNumber, 
+    copyrightText, description, excerpt, yearOfWork, width, height, 
+    medium, cost, MSRP, googleLink, googleDescription, wikiLink, jsonAnnotations,
+    artist:artists!inner (
+      artistId, firstName, lastName, nationality, gender, 
+      yearOfBirth, yearOfDeath, details, artistLink
+    ),
+    gallery:galleries!inner (
+      galleryId, galleryName, galleryNativeName, galleryCity, galleryAddress, 
+      galleryCountry, latitude, longitude, galleryWebSite, 
+      flickrPlaceId, yahooWoeId, googlePlaceId
+    )
+  `;
+
 module.exports = (supabase, sendResponse) => {
   // Returns all the paintings ( return all the fields in the paintings table, but not the foreign keys) by default, sort by title
   router.get("/api/paintings", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(
-        `*, artist:artists (*),
-        gallery:galleries (*)`
-      )
+      .select(paintingsSelect)
       .order("title", { ascending: true });
     sendResponse(res, { data, error }, "No paintings found");
   });
@@ -20,10 +32,7 @@ module.exports = (supabase, sendResponse) => {
 
     const { data, error } = await supabase
       .from("paintings")
-      .select(
-        `*, artist:artists (*),
-        gallery:galleries (*)`
-      )
+      .select(paintingsSelect)
       .order(sortBy, { ascending: true });
 
     sendResponse(res, { data, error }, "No paintings found");
@@ -33,7 +42,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/:ref", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .eq("paintingId", req.params.ref);
 
     sendResponse(
@@ -47,7 +56,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/search/:substring", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .ilike("title", `%${req.params.substring}%`)
       .order("title", { ascending: true });
 
@@ -77,7 +86,7 @@ module.exports = (supabase, sendResponse) => {
 
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .gte("yearOfWork", startYear)
       .lte("yearOfWork", endYear)
       .order("yearOfWork", { ascending: true });
@@ -93,7 +102,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/galleries/:ref", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .eq("galleryId", req.params.ref)
       .order("title", { ascending: true });
 
@@ -108,7 +117,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/artist/:ref", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .eq("artistId", req.params.ref)
       .order("title", { ascending: true });
 
@@ -123,7 +132,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/artist/country/:ref", async (req, res) => {
     const { data, error } = await supabase
       .from("paintings")
-      .select(`*, artist:artists (*), gallery:galleries (*)`)
+      .select(paintingsSelect)
       .ilike("artist.nationality", `${req.params.ref}%`)
       .order("title", { ascending: true });
 
@@ -138,7 +147,7 @@ module.exports = (supabase, sendResponse) => {
   router.get("/api/paintings/genre/:ref", async (req, res) => {
     const { data, error } = await supabase
       .from("paintinggenres")
-      .select(`paintings:paintings (paintingId, title, yearOfWork)`)
+      .select(`...paintings(paintingId, title, yearOfWork)`)
       .eq("genreId", req.params.ref)
       .order("paintings(yearOfWork)", {
         ascending: true,
@@ -155,10 +164,10 @@ module.exports = (supabase, sendResponse) => {
     const { data, error } = await supabase
       .from("paintinggenres")
       .select(
-        `painting:paintings!inner (paintingId, title, yearOfWork), era:genres!inner (eraId)`
+        `...paintings!inner (paintingId, title, yearOfWork), genres!inner ()`
       )
       .eq("genres.eraId", req.params.ref)
-      .order("painting(yearOfWork)", {
+      .order("paintings(yearOfWork)", {
         ascending: true,
       });
 
