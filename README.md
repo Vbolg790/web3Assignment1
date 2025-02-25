@@ -22,7 +22,7 @@ This project is an API built with Node.js and Express that interfaces with an ar
 | `/api/artists/search/substring`                  | Returns artists whose last name (case insensitive) begins with the provided substring          |
 | `/api/artists/country/substring`                 | Returns artists whose nationality (case insensitive) begins with the provided substring      |
 | `/api/paintings`                                 | Returns all paintings with all fields (excluding foreign keys). Provides all artist and gallery fields, sorted by title by default |
-| `/api/paintings/sort/title|year`                 | Returns all paintings, sorted by either `title` or `yearOfWork`                                                                |
+| `/api/paintings/sort/title\year`                 | Returns all paintings, sorted by either `title` or `yearOfWork`                                                                |
 | `/api/paintings/ref`                             | Returns the specified painting                                                                     |
 | `/api/paintings/search/substring`                | Returns paintings whose title (case insensitive) contains the provided substring           |
 | `/api/paintings/years/start/end`                 | Returns paintings between two years (inclusive), ordered by `yearOfWork`               |
