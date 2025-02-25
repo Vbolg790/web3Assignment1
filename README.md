@@ -38,9 +38,9 @@ This project is an API built with Node.js and Express that interfaces with an ar
 | [`/api/genres`](https://web3assignment1.onrender.com/api/genres)                             | Get all genres                        |
 | [`/api/genres/76`](https://web3assignment1.onrender.com/api/genres/76)                          | Get genre with ID 76                  |
 | [`/api/genres/painting/408`](https://web3assignment1.onrender.com/api/genres/painting/408)                | Get genre for painting with ID 408    |
-| `/api/genres/painting/jsdfhg`             | Invalid painting ID example           |
+| [`/api/genres/painting/jsdfhg`](https://web3assignment1.onrender.com/api/genres/painting/jsdfhg)             | Invalid painting ID example           |
 | [`/api/paintings/genre/78`](https://web3assignment1.onrender.com/api/paintings/genre/78)                 | Get paintings by genre with ID 78     |
-| `/api/paintings/era/2`                    | Get paintings by era with ID 2        |
+| [`/api/paintings/era/2`](https://web3assignment1.onrender.com/api/paintings/era/2)                    | Get paintings by era with ID 2        |
 | [`/api/counts/genres`](https://web3assignment1.onrender.com/api/counts/genres)                      | Get genre counts                      |
 | [`/api/counts/artists`](https://web3assignment1.onrender.com/api/counts/artists)                     | Get artist counts                     |
 | [`/api/counts/topgenres/20`](https://web3assignment1.onrender.com/api/counts/topgenres/20)                | Get top 20 genres                     |
