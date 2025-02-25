@@ -16,7 +16,7 @@ This project is an API built with Node.js and Express that interfaces with an ar
 | [`/api/eras`](https://web3assignment1.onrender.com/api/eras)                               | Get all eras                          |
 | [`/api/galleries`](https://web3assignment1.onrender.com/api/galleries)                          | Get all galleries                     |
 | [`/api/galleries/30`](https://web3assignment1.onrender.com/api/galleries/30)                       | Get gallery with ID 30                |
-| [`/api/galleries/Calgary`](https://web3assignment1.onrender.com/api/galleries/country/Calgary)                  | Get gallery by name 'Calgary'         |
+| [`/api/galleries/Calgary`](https://web3assignment1.onrender.com/api/galleries/Calgary)                  | Get gallery by name 'Calgary'         |
 | [`/api/galleries/country/fra`](https://web3assignment1.onrender.com/api/galleries/country/fra)              | Get galleries in countries starting with 'fra' |
 | [`/api/artists`](https://web3assignment1.onrender.com/api/artists)                            | Get all artists                       |
 | [`/api/artists/12`](https://web3assignment1.onrender.com/api/artists/12)                         | Get artist with ID 12                 |
