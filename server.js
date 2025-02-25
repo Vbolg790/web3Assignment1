@@ -250,6 +250,12 @@ app.get("/api/genres/:ref", async (req, res) => {
 
 // Returns the genres used in a given painting (order by genreName in ascending order)
 app.get("/api/genres/painting/:ref", async (req, res) => {
+  if (isNaN(req.params.ref)) {
+    return res.status(400).json({
+      error: `${req.params.ref} is an invalid character. Please provide a valid id number`,
+    });
+  }
+
   const { data, error } = await supabase
     .from("paintinggenres")
     .select(
@@ -286,16 +292,19 @@ app.get("/api/paintings/genre/:ref", async (req, res) => {
 // Returns all the paintings for a given era useing the eraId field, return just the paintingId, title, and yearOfWork. Sort by yearOfWork
 app.get("/api/paintings/era/:ref", async (req, res) => {
   const { data, error } = await supabase
-    .from("paintings")
-    .select("paintingId, title, yearOfWork")
-    .eq("eraId", req.params.ref);
-
-  const sortedData = data.sort((a, b) => a.yearOfWork - b.yearOfWork);
+    .from("paintinggenres")
+    .select(
+      `painting:paintings!inner (paintingId, title, yearOfWork), era:genres!inner (eraId)`
+    )
+    .eq("genres.eraId", req.params.ref)
+    .order("painting(yearOfWork)", {
+      ascending: true,
+    });
 
   sendResponse(
     res,
-    { data: sortedData, error },
-    `No paintings found for era ${req.params.ref}`
+    { data, error },
+    `No paintings found for era ID ${req.params.ref}`
   );
 });
 
