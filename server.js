@@ -138,7 +138,7 @@ app.get("/api/paintings/search/:substring", async (req, res) => {
   sendResponse(
     res,
     { data, error },
-    `No paintings found with titles containing "${req.params.substring}".`
+    `No paintings found with titles containing ${req.params.substring}`
   );
 });
 
@@ -204,7 +204,7 @@ app.get("/api/paintings/artist/:ref", async (req, res) => {
 });
 
 // Returns all the paintings by artists whose nationality begins with the provided substring
-app.get("/api/paintings/artists/country/:ref", async (req, res) => {
+app.get("/api/paintings/artist/country/:ref", async (req, res) => {
   const { data, error } = await supabase
     .from("paintings")
     .select(`*, artist:artists (*), gallery:galleries (*)`)
